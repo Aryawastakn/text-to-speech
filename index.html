@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #5a5a5a;
+        }
+
+        textarea {
+            width: 80%;
+            max-width: 600px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        audio {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text to Speech Converter</h1>
+    <textarea id="text-input" rows="4" placeholder="Enter your text here..."></textarea><br>
+    <button onclick="convertTextToSpeech()">Convert to Speech</button>
+    <audio id="audio-output" controls style="display:none;"></audio>
+
+    <script>
+        async function convertTextToSpeech() {
+            const text = document.getElementById('text-input').value;
+            const response = await fetch('/tts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text: text })
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const audioURL = URL.createObjectURL(blob);
+                const audioElement = document.getElementById('audio-output');
+                audioElement.style.display = 'block';
+                audioElement.src = audioURL;
+                audioElement.play();
+            } else {
+                const error = await response.json();
+                console.error('Error converting text to speech:', error);
+            }
+        }
+    </script>
+</body>
+</html>
